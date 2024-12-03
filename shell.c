@@ -20,12 +20,16 @@ int main(int argc, char *argv[]){
 	char a[256];
 	strcpy(a, line_buff);
 	char *reala = a;
-	char *token;
+	char *token, *semicolon_token;
 	int count= 0;
 	while((token = strsep(&reala," "))!= NULL){
-	 args[count] = token;
+   /*while(semicolon_token   = strsep(&token, ";")){
+     args[count] = semicolon_token;
+     //AHAHHAHA
+     }*/
+   args[count] = token;
 	 count++;
-	}
+	 }
 	args[count] = NULL;
 	pid_t p;
 	p = fork();
@@ -40,5 +44,4 @@ int main(int argc, char *argv[]){
     wait(&status);
   }
   exit(0);
- 
 }
