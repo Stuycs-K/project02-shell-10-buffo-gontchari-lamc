@@ -26,7 +26,7 @@ int main(int argc, char *argv[]){
   printf("~/%s/ $ ", curr);
   fflush(stdout);
 
-  while(fgets(line_buff,255,stdin)){
+  while(fgets(line_buff,255,stdin) != NULL){
   	char *nl = strchr(line_buff, '\n');
   	*nl = '\0';
   	char *args[256];
@@ -44,19 +44,23 @@ int main(int argc, char *argv[]){
   	p = fork();
   	if(p < 0){
        printf("%s\n",strerror(errno));
+    }
+    else if(p == 0){
+      if(strcmp(args[0], "cd") == 0){
+        // chdir()
       }
-      else if(p == 0){
+
   	  execvp(args[0], args);
   	  exit(0);
-      }
-      int status;
-      wait(&status);
-      
-      char loc[1024];
-      getcwd(loc, 1024);
-      printf("~/%s/ $ ", curr);
-      fflush(stdout);
     }
+    int status;
+    wait(&status);
+
+    // char loc[1024];
+    // getcwd(loc, 1024);
+    printf("~/%s/ $ ", curr);
+    fflush(stdout);
+  }
   exit(0);
 
 }
