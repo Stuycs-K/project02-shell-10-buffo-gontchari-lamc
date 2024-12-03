@@ -15,16 +15,18 @@ int main(int argc, char *argv[]){
   char line_buff[256];
 
   char loc[1024];
+  char *curr = loc;
+  char *token;
   getcwd(loc, 1024);
-  printf("%s/ $ ", loc);
+  for(int i = 0; i < 6; i++){
+    token = strsep(&curr, "/");
+    // printf("TOKEN HERE: %s\n", token);
+    // printf("CURR HERE: %s\n", curr);
+  }
+  printf("~/%s/ $ ", curr);
   fflush(stdout);
 
   while(fgets(line_buff,255,stdin)){
-    char loc[1024];
-    getcwd(loc, 1024);
-    printf("%s/ $ ", loc);
-    fflush(stdout);
-
   	char *nl = strchr(line_buff, '\n');
   	*nl = '\0';
   	char *args[256];
@@ -49,6 +51,11 @@ int main(int argc, char *argv[]){
       }
       int status;
       wait(&status);
+      
+      char loc[1024];
+      getcwd(loc, 1024);
+      printf("~/%s/ $ ", curr);
+      fflush(stdout);
     }
   exit(0);
 
