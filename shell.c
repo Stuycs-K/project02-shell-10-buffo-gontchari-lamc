@@ -14,6 +14,8 @@
 int main(int argc, char *argv[]){
   char line_buff[256];
   while(fgets(line_buff,255,stdin)){
+	char *nl = strchr(line_buff, '\n');
+	*nl = '\0';
 	char *args[256];
 	char a[256];
 	strcpy(a, line_buff);
@@ -31,7 +33,6 @@ int main(int argc, char *argv[]){
      printf("%s\n",strerror(errno));
     }
     else if(p == 0){
-	  printf("%s\n", line_buff);
 	  execvp(args[0], args);
 	  exit(0);
     }
