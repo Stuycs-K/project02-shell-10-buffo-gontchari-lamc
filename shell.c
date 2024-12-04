@@ -52,22 +52,34 @@ int main(int argc, char *argv[]){
     else if(p == 0){
       if(strcmp(args[0], "cd") == 0){
         // printf("%s\n", args[1]);
-        strcat(tracker, "/");
-        strcat(tracker, args[1]);
+        char temp[1024];
+        strcpy(temp, tracker);
+        strcat(temp, "/");
+        strcat(temp, args[1]);
         // printf("%s\n", tracker);
-        if(chdir(tracker) == 0){
+        if(chdir(temp) == 0){
           getcwd(tracker, 1024);
-          printf("CHANGE SUCCESS: %s\n", tracker);
-          curr = tracker;
+          // printf("CHANGE SUCCESS: %s\n", tracker);
+          char prompter[1024];
+          strcpy(prompter, tracker);
+          curr = prompter;
+          for(int i = 0; i < 6; i++){
+            strsep(&curr, "/");
+            // printf("TOKEN HERE: %s\n", token);
+            // printf("CURR HERE: %s\n", curr);
+          }
         }
         else{
+          // printf("%s\n", tracker);
           printf("Invalid path.\n");
         }
         // chdir()
       }
+      else{
+        execvp(args[0], args);
+    	  exit(0);
+      }
 
-  	  execvp(args[0], args);
-  	  exit(0);
     }
     int status;
     wait(&status);
