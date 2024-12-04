@@ -14,10 +14,13 @@
 int main(int argc, char *argv[]){
   char line_buff[256];
 
+  char tracker[1024];
   char loc[1024];
   char *curr = loc;
   char *token;
   getcwd(loc, 1024);
+  getcwd(tracker, 1024);
+  printf("%s\n", loc);
   for(int i = 0; i < 6; i++){
     token = strsep(&curr, "/");
     // printf("TOKEN HERE: %s\n", token);
@@ -47,6 +50,7 @@ int main(int argc, char *argv[]){
     }
     else if(p == 0){
       if(strcmp(args[0], "cd") == 0){
+        printf("%s\n", args[1]);
         // chdir()
       }
 
