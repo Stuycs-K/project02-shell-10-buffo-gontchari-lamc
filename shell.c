@@ -10,21 +10,26 @@
 #include <sys/wait.h>
 #include <dirent.h>
 #include <signal.h>
+#include <pwd.h>
+
+const char *homedir;
 
 int main(int argc, char *argv[]){
+  homedir = getpwuid(getuid())->pw_dir;
+  printf("%s\n", homedir);
   char line_buff[256];
-
   char loc[1024];
   char *curr = loc;
   char *token;
   getcwd(loc, 1024);
-  for(int i = 0; i < 6; i++){
+  for(int i = 0; i < 6; i++){ //When you are beyond home direcotry, put a tilda
     token = strsep(&curr, "/");
     // printf("TOKEN HERE: %s\n", token);
     // printf("CURR HERE: %s\n", curr);
   }
   printf("~/%s/ $ ", curr);
   fflush(stdout);
+
 
   while(fgets(line_buff,255,stdin) != NULL){
   	char *nl = strchr(line_buff, '\n');
