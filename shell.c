@@ -22,14 +22,13 @@ int main(int argc, char *argv[]){
   char *curr = loc;
   char *token;
   getcwd(loc, 1024);
-  for(int i = 0; i < 6; i++){ //When you are beyond home direcotry, put a tilda
+  for(int i = 0; i < 3; i++){ //This needs adjusting
     token = strsep(&curr, "/");
     // printf("TOKEN HERE: %s\n", token);
     // printf("CURR HERE: %s\n", curr);
   }
   printf("~/%s/ $ ", curr);
   fflush(stdout);
-
 
   while(fgets(line_buff,255,stdin) != NULL){
   	char *nl = strchr(line_buff, '\n');
