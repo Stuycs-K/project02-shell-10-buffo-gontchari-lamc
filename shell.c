@@ -18,7 +18,7 @@ int main(int argc, char *argv[]){
   char *curr = loc;
   char *token;
   getcwd(loc, 1024);
-  for(int i = 0; i < 6; i++){
+  for(int i = 0; i < 3; i++){ //This needs adjusting 
     token = strsep(&curr, "/");
     // printf("TOKEN HERE: %s\n", token);
     // printf("CURR HERE: %s\n", curr);
@@ -26,7 +26,7 @@ int main(int argc, char *argv[]){
   printf("~/%s/ $ ", curr);
   fflush(stdout);
 
-  while(fgets(line_buff,255,stdin)){
+  while(fgets(line_buff,255,stdin) != NULL){
   	char *nl = strchr(line_buff, '\n');
   	*nl = '\0';
   	char *args[256];
