@@ -13,6 +13,7 @@
 
 int main(int argc, char *argv[]){
   char line_buff[256];
+  // int stdout = STDOUT_FILENO;
 
   char tracker[1024];
   char loc[1024];
@@ -20,7 +21,7 @@ int main(int argc, char *argv[]){
   char *token;
   getcwd(loc, 1024);
   getcwd(tracker, 1024);
-  printf("%s\n", loc);
+  // printf("%s\n", loc);
   for(int i = 0; i < 6; i++){
     token = strsep(&curr, "/");
     // printf("TOKEN HERE: %s\n", token);
@@ -50,7 +51,18 @@ int main(int argc, char *argv[]){
     }
     else if(p == 0){
       if(strcmp(args[0], "cd") == 0){
-        printf("%s\n", args[1]);
+        // printf("%s\n", args[1]);
+        strcat(tracker, "/");
+        strcat(tracker, args[1]);
+        // printf("%s\n", tracker);
+        if(chdir(tracker) == 0){
+          getcwd(tracker, 1024);
+          printf("CHANGE SUCCESS: %s\n", tracker);
+          curr = tracker;
+        }
+        else{
+          printf("Invalid path.\n");
+        }
         // chdir()
       }
 
