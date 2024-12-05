@@ -15,11 +15,11 @@
 const char *homedir;
 
 int main(int argc, char *argv[]){
-  int dir_tier, curr_tier;
+  int homedir_tier, curr_tier;
   homedir = getpwuid(getuid())->pw_dir;
-  //Get level of directory 
-  for (dir_tier=0; homedir[dir_tier]; homedir[dir_tier]=='/' ? dir_tier++ : *homedir++);
-  //printf("%d\n", dir_tier);
+  //Get level of directory
+  for (homedir_tier=0; homedir[homedir_tier]; homedir[homedir_tier]=='/' ? homedir_tier++ : *homedir++);
+  //printf("%d\n", homedir_tier);
   //printf("%s\n", homedir);
   char line_buff[256];
   char tracker[1024];
@@ -31,13 +31,14 @@ int main(int argc, char *argv[]){
   strcpy(tempstr, loc);
   char *tempcurr = tempstr;
   for (curr_tier=0; tempcurr[curr_tier]; tempcurr[curr_tier]=='/' ? curr_tier++ : *tempcurr++);
-  printf("%d\n",curr_tier);
- if(curr_tier >  dir_tier){
+  //printf("%d\n",curr_tier);
+ if(curr_tier >  homedir_tier){
 		printf("~");
+    for(int i = 0; i < homedir_tier + 1; i++){
+  	 token = strsep(&curr, "/");
+   }
  }
-  for(int i = 0; i < dir_tier + 1; i++){
-	 token = strsep(&curr, "/"); 
- }
+
   getcwd(tracker, 1024);
 
   printf("/%s/ $ ", curr);
@@ -76,11 +77,16 @@ int main(int argc, char *argv[]){
           char prompter[1024];
           strcpy(prompter, tracker);
           curr = prompter;
-          for(int i = 0; i < 6; i++){
-            strsep(&curr, "/");
-            // printf("TOKEN HERE: %s\n", token);
-            // printf("CURR HERE: %s\n", curr);
-          }
+          // curr contains new pwd printf("%s\n", curr);
+          printf("%s\n", curr);
+          for (curr_tier=0; tempcurr[curr_tier]; tempcurr[curr_tier]=='/' ? curr_tier++ : *tempcurr++); //change tempcurr xd
+printf("%d\n", curr_tier);
+          if(curr_tier >  homedir_tier){
+         		printf("~");
+        }
+        for(int i = 0; i < curr_tier + 1; i++){
+        token = strsep(&curr, "/");
+        }
         }
         else{
           // printf("%s\n", tracker);
