@@ -15,19 +15,32 @@
 const char *homedir;
 
 int main(int argc, char *argv[]){
+  int dir_tier, curr_tier;
   homedir = getpwuid(getuid())->pw_dir;
-  printf("%s\n", homedir);
+  //Get level of directory 
+  for (dir_tier=0; homedir[dir_tier]; homedir[dir_tier]=='/' ? dir_tier++ : *homedir++);
+  //printf("%d\n", dir_tier);
+  //printf("%s\n", homedir);
   char line_buff[256];
   char loc[1024];
   char *curr = loc;
   char *token;
   getcwd(loc, 1024);
-  for(int i = 0; i < 3; i++){ //This needs adjusting
-    token = strsep(&curr, "/");
+  char tempstr[1024];
+  strcpy(tempstr, loc);
+  char *tempcurr = tempstr;
+  for (curr_tier=0; tempcurr[curr_tier]; tempcurr[curr_tier]=='/' ? curr_tier++ : *tempcurr++);
+  printf("%d\n",curr_tier);
+ if(curr_tier >  dir_tier){
+		printf("~");
+  for(int i = 0; i < dir_tier + 1; i++){
+	 token = strsep(&curr, "/"); 
     // printf("TOKEN HERE: %s\n", token);
     // printf("CURR HERE: %s\n", curr);
-  }
-  printf("~/%s/ $ ", curr);
+	}
+ }
+
+  printf("/%s/ $ ", curr);
   fflush(stdout);
 
   while(fgets(line_buff,255,stdin) != NULL){
