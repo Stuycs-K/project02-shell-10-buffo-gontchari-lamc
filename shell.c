@@ -22,6 +22,7 @@ int main(int argc, char *argv[]){
   //printf("%d\n", dir_tier);
   //printf("%s\n", homedir);
   char line_buff[256];
+  char tracker[1024];
   char loc[1024];
   char *curr = loc;
   char *token;
@@ -33,12 +34,11 @@ int main(int argc, char *argv[]){
   printf("%d\n",curr_tier);
  if(curr_tier >  dir_tier){
 		printf("~");
+ }
   for(int i = 0; i < dir_tier + 1; i++){
 	 token = strsep(&curr, "/"); 
-    // printf("TOKEN HERE: %s\n", token);
-    // printf("CURR HERE: %s\n", curr);
-	}
  }
+  getcwd(tracker, 1024);
 
   printf("/%s/ $ ", curr);
   fflush(stdout);
@@ -61,19 +61,47 @@ int main(int argc, char *argv[]){
   	p = fork();
   	if(p < 0){
        printf("%s\n",strerror(errno));
-      }
-      else if(p == 0){
-  	  execvp(args[0], args);
-  	  exit(0);
-      }
-      int status;
-      wait(&status);
-
-      char loc[1024];
-      getcwd(loc, 1024);
-      printf("~/%s/ $ ", curr);
-      fflush(stdout);
     }
+    else if(p == 0){
+      if(strcmp(args[0], "cd") == 0){
+        // printf("%s\n", args[1]);
+        char temp[1024];
+        strcpy(temp, tracker);
+        strcat(temp, "/");
+        strcat(temp, args[1]);
+        // printf("%s\n", tracker);
+        if(chdir(temp) == 0){
+          getcwd(tracker, 1024);
+          // printf("CHANGE SUCCESS: %s\n", tracker);
+          char prompter[1024];
+          strcpy(prompter, tracker);
+          curr = prompter;
+          for(int i = 0; i < 6; i++){
+            strsep(&curr, "/");
+            // printf("TOKEN HERE: %s\n", token);
+            // printf("CURR HERE: %s\n", curr);
+          }
+        }
+        else{
+          // printf("%s\n", tracker);
+          printf("Invalid path.\n");
+        }
+        // chdir()
+      }
+      else{
+        execvp(args[0], args);
+    	  exit(0);
+      }
+
+    }
+    int status;
+    wait(&status);
+
+    // char loc[1024];
+    // getcwd(loc, 1024);
+    printf("~/%s/ $ ", curr);
+    fflush(stdout);
+  }
   exit(0);
 
 }
