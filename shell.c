@@ -17,7 +17,7 @@ const char *homedir;
 int main(int argc, char *argv[]){
   int dir_tier, curr_tier;
   homedir = getpwuid(getuid())->pw_dir;
-  //Get level of directory 
+  //Get level of directory
   for (dir_tier=0; homedir[dir_tier]; homedir[dir_tier]=='/' ? dir_tier++ : *homedir++);
   //printf("%d\n", dir_tier);
   //printf("%s\n", homedir);
@@ -31,12 +31,12 @@ int main(int argc, char *argv[]){
   strcpy(tempstr, loc);
   char *tempcurr = tempstr;
   for (curr_tier=0; tempcurr[curr_tier]; tempcurr[curr_tier]=='/' ? curr_tier++ : *tempcurr++);
-  printf("%d\n",curr_tier);
+  // printf("%d\n",curr_tier);
  if(curr_tier >  dir_tier){
 		printf("~");
  }
   for(int i = 0; i < dir_tier + 1; i++){
-	 token = strsep(&curr, "/"); 
+	 token = strsep(&curr, "/");
  }
   getcwd(tracker, 1024);
 
@@ -51,51 +51,55 @@ int main(int argc, char *argv[]){
   	strcpy(a, line_buff);
   	char *reala = a;
   	char *token;
-  	int count= 0;
-  	while((token = strsep(&reala," "))!= NULL){
-  	 args[count] = token;
-  	 count++;
-  	}
-  	args[count] = NULL;
-  	pid_t p;
-  	p = fork();
-  	if(p < 0){
-       printf("%s\n",strerror(errno));
-    }
-    else if(p == 0){
-      if(strcmp(args[0], "cd") == 0){
-        // printf("%s\n", args[1]);
-        char temp[1024];
-        strcpy(temp, tracker);
-        strcat(temp, "/");
-        strcat(temp, args[1]);
-        // printf("%s\n", tracker);
-        if(chdir(temp) == 0){
-          getcwd(tracker, 1024);
-          // printf("CHANGE SUCCESS: %s\n", tracker);
-          char prompter[1024];
-          strcpy(prompter, tracker);
-          curr = prompter;
-          for(int i = 0; i < 6; i++){
-            strsep(&curr, "/");
-            // printf("TOKEN HERE: %s\n", token);
-            // printf("CURR HERE: %s\n", curr);
+
+    while((token = strsep(&reala,";")) != NULL){
+      int count= 0;
+      char *holder;
+    	while((holder = strsep(&token," "))!= NULL){
+    	 args[count] = holder;
+    	 count++;
+    	}
+    	args[count] = NULL;
+    	pid_t p;
+    	p = fork();
+    	if(p < 0){
+         printf("%s\n",strerror(errno));
+      }
+      else if(p == 0){
+        if(strcmp(args[0], "cd") == 0){
+          // printf("%s\n", args[1]);
+          char temp[1024];
+          strcpy(temp, tracker);
+          strcat(temp, "/");
+          strcat(temp, args[1]);
+          // printf("%s\n", tracker);
+          if(chdir(temp) == 0){
+            getcwd(tracker, 1024);
+            // printf("CHANGE SUCCESS: %s\n", tracker);
+            char prompter[1024];
+            strcpy(prompter, tracker);
+            curr = prompter;
+            for(int i = 0; i < 6; i++){
+              strsep(&curr, "/");
+              // printf("TOKEN HERE: %s\n", token);
+              // printf("CURR HERE: %s\n", curr);
+            }
           }
+          else{
+            // printf("%s\n", tracker);
+            printf("Invalid path.\n");
+          }
+          // chdir()
         }
         else{
-          // printf("%s\n", tracker);
-          printf("Invalid path.\n");
+          execvp(args[0], args);
+      	  exit(0);
         }
-        // chdir()
-      }
-      else{
-        execvp(args[0], args);
-    	  exit(0);
-      }
 
+      }
+      int status;
+      wait(&status);
     }
-    int status;
-    wait(&status);
 
     // char loc[1024];
     // getcwd(loc, 1024);
