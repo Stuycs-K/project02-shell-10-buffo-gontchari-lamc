@@ -30,8 +30,6 @@ int main(int argc, char *argv[]){
   strcpy(tempstr, loc);
   char *tempcurr = tempstr;
   for (curr_tier=0; tempcurr[curr_tier]; tempcurr[curr_tier]=='/' ? curr_tier++ : *tempcurr++);
-  printf("%d\n",curr_tier);
-   printf("%d\n", homedir_tier);
  if(curr_tier >  homedir_tier){
 	printf("~");
     for(int i = 0; i < homedir_tier + 1; i++){
@@ -108,6 +106,7 @@ int main(int argc, char *argv[]){
         // chdir()
       }
       else{
+
         execvp(args[0], args);
     	  exit(0);
       }
@@ -121,14 +120,24 @@ int main(int argc, char *argv[]){
 
 
   if(executedcommand){
-    printf("~/%s $ ", curr);
+   if(curr_tier == homedir_tier){
+		printf("~$ ");
+	  }else{
+		printf("~/%s $ ", curr);
+	  }
   }
-  else  if(printfordashes){
+  else if(printfordashes){
+	if(curr_tier == homedir_tier){
+		printf("~$ ");
+	}
+	else if(homedir_tier > curr_tier){
+		printf("%s $ ", curr);
+	}	
+	else{
 		printf("/%s $ ", curr);
 	}
-	else if(curr_tier != 1 && homedir_tier > curr_tier){
-		printf("%s $ ", curr);
 	}
+	
   else if(curr_tier == homedir_tier){
 		printf("~$ ");
 	}
