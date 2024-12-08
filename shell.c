@@ -136,18 +136,26 @@ int main(int argc, char *argv[]){
             exit(0);
           }
           if(strcmp(redir, "|") == 0){
-            fflush(stdout);
-            int fd1 = open("temp", O_WRONLY | O_TRUNC | O_CREAT, 0777);;
-            int backup_stdout = dup( STDOUT_FILENO );
-            dup2(fd1, STDOUT_FILENO);
-            execvp(args1[0], args1);
-            fflush(stdout);
-            close(fd1);
-            fd1 = open("temp", O_RDONLY);
+            pid_t p2;
+            p2 = fork();
+            if(p2 == 0){
+              int fd1 = open("temp", O_WRONLY | O_TRUNC | O_CREAT, 0777);;
+              int backup_stdout = dup( STDOUT_FILENO );
+              dup2(fd1, STDOUT_FILENO);
+              execvp(args1[0], args1);
+              fflush(stdout);
+              close(fd1);
+              exit(0);
+            }
+            int status;
+            wait(&status);
+            int fd1 = open("temp", O_RDONLY);
             int backup_stdin = dup( STDIN_FILENO );
             dup2(fd1, STDIN_FILENO);
             execvp(args2[0], args2);
             fflush(stdout);
+            close(fd1);
+            unlink("temp");
             exit(0);
           }
           execvp(args1[0], args1);
