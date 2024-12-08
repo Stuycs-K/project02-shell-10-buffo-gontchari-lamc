@@ -110,59 +110,57 @@ int main(int argc, char *argv[]){
         }
         else{
           if(strcmp(redir, ">") == 0){
-            printf("%s\n", args2[0]);
-            int fd1 = open(args2[0], O_WRONLY | O_TRUNC | O_CREAT);
-            int stdout = STDOUT_FILENO;
-            // int backup_stdout = dup( stdout );
-            dup2(fd1, stdout);
+            int fd1 = open(args2[0], O_WRONLY | O_TRUNC | O_CREAT, 0777);
+            int backup_stdout = dup( STDOUT_FILENO );
+            dup2(fd1, STDOUT_FILENO);
             execvp(args1[0], args1);
+            fflush(stdout);
             close(fd1);
             exit(0);
           }
           if(strcmp(redir, ">>") == 0){
             int fd1 = open(args2[0], O_WRONLY | O_APPEND);
-            int stdout = STDOUT_FILENO;
-            int backup_stdout = dup( stdout );
-            dup2(fd1, stdout);
+            int backup_stdout = dup( STDOUT_FILENO );
+            dup2(fd1, STDOUT_FILENO);
             execvp(args1[0], args1);
+            fflush(stdout);
             close(fd1);
             exit(0);
           }
           if(strcmp(redir, "<") == 0){
             int fd1 = open(args2[0], O_RDONLY);
-            int stdin = STDIN_FILENO;
-            int backup_stdin = dup( stdin );
-            dup2(fd1, stdin);
+            int backup_stdin = dup( STDIN_FILENO );
+            dup2(fd1, STDIN_FILENO);
             execvp(args1[0], args1);
+            fflush(stdout);
             exit(0);
           }
           if(strcmp(redir, "|") == 0){
-            int fd1 = open("temp", O_WRONLY | O_TRUNC);
-            int stdout = STDOUT_FILENO;
-            int backup_stdout = dup( stdout );
-            dup2(fd1, stdout);
+            fflush(stdout);
+            int fd1 = open("temp", O_WRONLY | O_TRUNC | O_CREAT, 0777);;
+            int backup_stdout = dup( STDOUT_FILENO );
+            dup2(fd1, STDOUT_FILENO);
             execvp(args1[0], args1);
-            dup2(backup_stdout, stdout);
+            fflush(stdout);
             close(fd1);
             fd1 = open("temp", O_RDONLY);
-            int stdin = STDIN_FILENO;
-            int backup_stdin = dup( stdin );
-            dup2(fd1, stdin);
+            int backup_stdin = dup( STDIN_FILENO );
+            dup2(fd1, STDIN_FILENO);
             execvp(args2[0], args2);
+            fflush(stdout);
             exit(0);
           }
           execvp(args1[0], args1);
           exit(0);
         }
-        int status;
-        wait(&status);
       }
-      
-      // char loc[1024];
-      // getcwd(loc, 1024);
-      printf("~/%s/ $ ", curr);
-      fflush(stdout);
+      int status;
+      wait(&status);
     }
+    // char loc[1024];
+    // getcwd(loc, 1024);
+    printf("~/%s/ $ ", curr);
+    fflush(stdout);
   }
   exit(0);
  if(curr_tier >  dir_tier){
@@ -229,7 +227,6 @@ int main(int argc, char *argv[]){
           execvp(args[0], args);
       	  exit(0);
         }
-
       }
       int status;
       wait(&status);
