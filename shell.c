@@ -32,7 +32,7 @@ int main(int argc, char *argv[]){
   char *tempcurr = tempstr;
   for (curr_tier=0; tempcurr[curr_tier]; tempcurr[curr_tier]=='/' ? curr_tier++ : *tempcurr++);
   // printf("%d\n",curr_tier);
-<<<<<<< HEAD
+
   if(curr_tier >  dir_tier){
     printf("~");
   }
@@ -62,7 +62,7 @@ int main(int argc, char *argv[]){
       int count2=0;
       int which=1;
       char *holder;
-      char *redir=NULL;
+      char *redir="";
       while((holder = strsep(&token," "))!= NULL){
         if(strcmp(holder, ">") == 0 || strcmp(holder, ">>") == 0 || strcmp(holder, "<") == 0 || strcmp(holder, "|") == 0){
           which = 2;
@@ -74,86 +74,85 @@ int main(int argc, char *argv[]){
           else
             args2[count2++] = holder;
         }
-        args1[count1] = NULL;
-        args2[count2] = NULL;
-        pid_t p;
-        p = fork();
-        if(p < 0){
-          printf("%s\n",strerror(errno));
-        }
-        else if(p == 0){
-          if(strcmp(args1[0], "cd") == 0){
-            // printf("%s\n", args[1]);
-            char temp[1024];
-            strcpy(temp, tracker);
-            strcat(temp, "/");
-            strcat(temp, args1[1]);
-            // printf("%s\n", tracker);
-            if(chdir(temp) == 0){
-              getcwd(tracker, 1024);
-              // printf("CHANGE SUCCESS: %s\n", tracker);
-              char prompter[1024];
-              strcpy(prompter, tracker);
-              curr = prompter;
-              for(int i = 0; i < 6; i++){
-                strsep(&curr, "/");
-                // printf("TOKEN HERE: %s\n", token);
-                // printf("CURR HERE: %s\n", curr);
-              }
+      }
+      args1[count1] = NULL;
+      args2[count2] = NULL;
+      pid_t p;
+      p = fork();
+      if(p < 0){
+        printf("%s\n",strerror(errno));
+      }
+      else if(p == 0){
+        if(strcmp(args1[0], "cd") == 0){
+          // printf("%s\n", args[1]);
+          char temp[1024];
+          strcpy(temp, tracker);
+          strcat(temp, "/");
+          strcat(temp, args1[1]);
+          // printf("%s\n", tracker);
+          if(chdir(temp) == 0){
+            getcwd(tracker, 1024);
+            // printf("CHANGE SUCCESS: %s\n", tracker);
+            char prompter[1024];
+            strcpy(prompter, tracker);
+            curr = prompter;
+            for(int i = 0; i < 6; i++){
+              strsep(&curr, "/");
+              // printf("TOKEN HERE: %s\n", token);
+              // printf("CURR HERE: %s\n", curr);
             }
-            else{
-              // printf("%s\n", tracker);
-              printf("Invalid path.\n");
-            }
-            // chdir()
           }
           else{
-            if(strcmp(redir, ">")){
-              int fd1 = open(args2[0], O_WRONLY | O_TRUNC);
-              int stdout = STDOUT_FILENO;
-              int backup_stdout = dup( stdout );
-              dup2(fd1, stdout);
-              execvp(args1[0], args1);
-              fflush(stdout);
-              exit(0);
-            }
-            if(strcmp(redir, ">>")){
-              int fd1 = open(args2[0], O_WRONLY | O_APPEND);
-              int stdout = STDOUT_FILENO;
-              int backup_stdout = dup( stdout );
-              dup2(fd1, stdout);
-              execvp(args1[0], args1);
-              fflush(stdout);
-              exit(0);
-            }
-            if(strcmp(redir, "<")){
-              int fd1 = open(args2[0], O_RDONLY);
-              int stdin = STDIN_FILENO;
-              int backup_stdin = dup( stdin );
-              dup2(fd1, stdin);
-              execvp(args1[0], args1);
-              exit(0);
-            }
-            if(strcmp(redir, "|")){
-              int fd1 = open("temp", O_WRONLY | O_TRUNC);
-              int stdout = STDOUT_FILENO;
-              int backup_stdout = dup( stdout );
-              dup2(fd1, stdout);
-              execvp(args1[0], args1);
-              fflush(stdout);
-              dup2(backup_stdout, stdout);
-              close(fd1);
-              fd1 = open("temp", O_RDONLY);
-              int stdin = STDIN_FILENO;
-              int backup_stdin = dup( stdin );
-              dup2(fd1, stdin);
-              execvp(args2[0], args2);
-              exit(0);
-            }
+            // printf("%s\n", tracker);
+            printf("Invalid path.\n");
+          }
+          // chdir()
+        }
+        else{
+          if(strcmp(redir, ">") == 0){
+            printf("%s\n", args2[0]);
+            int fd1 = open(args2[0], O_WRONLY | O_TRUNC | O_CREAT);
+            int stdout = STDOUT_FILENO;
+            // int backup_stdout = dup( stdout );
+            dup2(fd1, stdout);
+            execvp(args1[0], args1);
+            close(fd1);
+            exit(0);
+          }
+          if(strcmp(redir, ">>") == 0){
+            int fd1 = open(args2[0], O_WRONLY | O_APPEND);
+            int stdout = STDOUT_FILENO;
+            int backup_stdout = dup( stdout );
+            dup2(fd1, stdout);
+            execvp(args1[0], args1);
+            close(fd1);
+            exit(0);
+          }
+          if(strcmp(redir, "<") == 0){
+            int fd1 = open(args2[0], O_RDONLY);
+            int stdin = STDIN_FILENO;
+            int backup_stdin = dup( stdin );
+            dup2(fd1, stdin);
             execvp(args1[0], args1);
             exit(0);
           }
-          
+          if(strcmp(redir, "|") == 0){
+            int fd1 = open("temp", O_WRONLY | O_TRUNC);
+            int stdout = STDOUT_FILENO;
+            int backup_stdout = dup( stdout );
+            dup2(fd1, stdout);
+            execvp(args1[0], args1);
+            dup2(backup_stdout, stdout);
+            close(fd1);
+            fd1 = open("temp", O_RDONLY);
+            int stdin = STDIN_FILENO;
+            int backup_stdin = dup( stdin );
+            dup2(fd1, stdin);
+            execvp(args2[0], args2);
+            exit(0);
+          }
+          execvp(args1[0], args1);
+          exit(0);
         }
         int status;
         wait(&status);
@@ -164,9 +163,8 @@ int main(int argc, char *argv[]){
       printf("~/%s/ $ ", curr);
       fflush(stdout);
     }
-    exit(0);
   }
-=======
+  exit(0);
  if(curr_tier >  dir_tier){
 		printf("~");
  }
@@ -242,6 +240,4 @@ int main(int argc, char *argv[]){
     fflush(stdout);
   }
   exit(0);
-
->>>>>>> 14bf08b87d16abe5f3522ae3d412646d5c9337d6
 }
