@@ -220,7 +220,8 @@ int main(int argc, char *argv[]){
           }
           else{
             // printf("%s\n", tracker);
-            printf("Invalid path.\n");
+            // printf("Invalid path.\n");
+            printf("%s\n",strerror(errno));
           }
           // chdir()
         }
