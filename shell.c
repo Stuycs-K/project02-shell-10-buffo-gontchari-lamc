@@ -15,10 +15,10 @@
 const char *homedir;
 
 int main(int argc, char *argv[]){
-  int dir_tier, curr_tier;
+  int homedir_tier, curr_tier, printfordashes = 1, executedcommand = 1;
   homedir = getpwuid(getuid())->pw_dir;
   //Get level of directory
-  for (dir_tier=0; homedir[dir_tier]; homedir[dir_tier]=='/' ? dir_tier++ : *homedir++);
+  for (homedir_tier=0; homedir[homedir_tier]; homedir[homedir_tier]=='/' ? homedir_tier++ : *homedir++);
   //printf("%d\n", dir_tier);
   //printf("%s\n", homedir);
   char line_buff[256];
@@ -32,16 +32,21 @@ int main(int argc, char *argv[]){
   char *tempcurr = tempstr;
   for (curr_tier=0; tempcurr[curr_tier]; tempcurr[curr_tier]=='/' ? curr_tier++ : *tempcurr++);
   // printf("%d\n",curr_tier);
+if(curr_tier >  homedir_tier){
+	printf("~");
+    for(int i = 0; i < homedir_tier + 1; i++){
+  	 token = strsep(&curr, "/");
+   }
+ }
+   else if (curr_tier ==  homedir_tier){
+	printf("~");
+	printfordashes = 0;
+   }
 
-  if(curr_tier >  dir_tier){
-    printf("~");
-  }
-  for(int i = 0; i < dir_tier + 1; i++){
-    token = strsep(&curr, "/");
-  }
   getcwd(tracker, 1024);
-  
-  printf("/%s/ $ ", curr);
+  if(printfordashes)
+	printf("/%s $ ", curr);
+  printfordashes = 1;
   fflush(stdout);
   
   while(fgets(line_buff,255,stdin) != NULL){
@@ -56,8 +61,10 @@ int main(int argc, char *argv[]){
       if (strcmp(token, "exit") == 0){
         exit(0);
       }
+	  char *args[256];
       char *args1[256];
       char *args2[256];
+	  int count;
       int count1=0;
       int count2=0;
       int which=1;
@@ -74,7 +81,10 @@ int main(int argc, char *argv[]){
           else
             args2[count2++] = holder;
         }
+    	 args[count] = holder;
+    	 count++;
       }
+	  args[count] = NULL;
       args1[count1] = NULL;
       args2[count2] = NULL;
       pid_t p;
@@ -83,31 +93,66 @@ int main(int argc, char *argv[]){
         printf("%s\n",strerror(errno));
       }
       else if(p == 0){
-        if(strcmp(args1[0], "cd") == 0){
-          // printf("%s\n", args[1]);
-          char temp[1024];
-          strcpy(temp, tracker);
-          strcat(temp, "/");
-          strcat(temp, args1[1]);
-          // printf("%s\n", tracker);
-          if(chdir(temp) == 0){
-            getcwd(tracker, 1024);
-            // printf("CHANGE SUCCESS: %s\n", tracker);
-            char prompter[1024];
-            strcpy(prompter, tracker);
-            curr = prompter;
-            for(int i = 0; i < 6; i++){
-              strsep(&curr, "/");
-              // printf("TOKEN HERE: %s\n", token);
-              // printf("CURR HERE: %s\n", curr);
-            }
-          }
-          else{
-            // printf("%s\n", tracker);
-            printf("Invalid path.\n");
-          }
-          // chdir()
+	if(strcmp(args[0], "cd") == 0){
+        executedcommand = 0;
+		if(strstr(args[1], "~") != NULL){			
+			char *home_dir = getenv("HOME");
+			chdir(home_dir);
+			getcwd(tracker, 1024);
+			//printf("tracker: %s\n", tracker);
+			curr_tier = homedir_tier;
+			if(strcmp(args[1], "~") != 0){
+				char evenmoreargs[1024];
+				strcpy(evenmoreargs, args[1]);
+				char realargs[1024];
+				for(int i = 1; i < strlen(evenmoreargs); i++){
+					realargs[i - 1] = evenmoreargs[i];
+				}
+				realargs[strlen(evenmoreargs ) - 1] = '\0';
+				strcpy(args[1], realargs);
+				//printf("args1: %s\n", args[1]);
+				//chdir(args[1]);
+				//curr_tier
+			}
+		}
+        // printf("%s\n", args[1]);
+        char temp[1024];
+        strcpy(temp, tracker);
+        strcat(temp, "/");
+        strcat(temp, args[1]);
+        //printf("temp: %s\n", temp);
+        if(strcmp(args[1], "~") == 0 || chdir(temp) == 0){
+          getcwd(tracker, 1024);
+          // printf("CHANGE SUCCESS: %s\n", tracker);
+          char prompter[1024];
+          strcpy(prompter, tracker);
+          curr = prompter;
+		char stringtemp[1024];
+		strcpy(stringtemp, tracker);
+		tempcurr = stringtemp;
+          // curr contains new pwd printf("%s\n", curr);
+		  if(strcmp(args[1], "~") != 0){
+			for (curr_tier=0; tempcurr[curr_tier]; tempcurr[curr_tier]=='/' ? curr_tier++ : *tempcurr++); //change tempcurr xd
+		  }
+          if(curr_tier > homedir_tier){
+         		printf("~");
+			for(int i = 0; i < homedir_tier + 1; i++){
+				token = strsep(&curr, "/");
+			}
+		  }
+	   else if (curr_tier ==  homedir_tier){
+		printfordashes = 0;
+        }else{
+			printfordashes = 0;
+		}
         }
+        else{
+          // printf("%s\n", tracker);
+          printf("Invalid path.\n");
+		  executedcommand = 1;
+		}
+        // chdir()
+		}
         else{
           if(strcmp(redir, ">") == 0){
             int fd1 = open(args2[0], O_WRONLY | O_TRUNC | O_CREAT, 0777);
@@ -165,12 +210,43 @@ int main(int argc, char *argv[]){
       int status;
       wait(&status);
     }
-    // char loc[1024];
-    // getcwd(loc, 1024);
-    printf("~/%s/ $ ", curr);
+  if(executedcommand){
+   if(curr_tier == homedir_tier){
+		printf("~$ ");
+	  }
+	else if(homedir_tier > curr_tier){
+		printf("%s $ ", curr);
+	}	
+	  else{
+		printf("~/%s $ ", curr);
+	  }
+  }
+  else if(printfordashes){
+	if(curr_tier == homedir_tier){
+		printf("~$ ");
+	}
+	else if(homedir_tier > curr_tier){
+		printf("%s $ ", curr);
+	}	
+	else{
+		printf("/%s $ ", curr);
+	}
+	}
+	
+  else if(curr_tier == homedir_tier){
+		printf("~$ ");
+	}
+	else{
+		printf("%s $ ",  curr);
+	}
+	printfordashes = 1;
+  if(homedir_tier < curr_tier){
+    executedcommand = 1;
+  }
     fflush(stdout);
   }
   exit(0);
+  /*
  if(curr_tier >  dir_tier){
 		printf("~");
  }
@@ -180,9 +256,9 @@ int main(int argc, char *argv[]){
   getcwd(tracker, 1024);
 
   printf("/%s/ $ ", curr);
-  fflush(stdout);
+  fflush(stdout);*/
 
-  while(fgets(line_buff,255,stdin) != NULL){
+   while(fgets(line_buff,255,stdin) != NULL){
   	char *nl = strchr(line_buff, '\n');
   	*nl = '\0';
   	char *args[256];
@@ -190,60 +266,130 @@ int main(int argc, char *argv[]){
   	strcpy(a, line_buff);
   	char *reala = a;
   	char *token;
-
-    while((token = strsep(&reala,";")) != NULL){
-      int count= 0;
-      char *holder;
-    	while((holder = strsep(&token," "))!= NULL){
-    	 args[count] = holder;
-    	 count++;
-    	}
-    	args[count] = NULL;
-    	pid_t p;
-    	p = fork();
-    	if(p < 0){
-         printf("%s\n",strerror(errno));
+  	int count= 0;
+  	while((token = strsep(&reala," "))!= NULL){
+      if (strcmp(token, "exit") == 0){
+        exit(0);
       }
-      else if(p == 0){
-        if(strcmp(args[0], "cd") == 0){
-          // printf("%s\n", args[1]);
-          char temp[1024];
-          strcpy(temp, tracker);
-          strcat(temp, "/");
-          strcat(temp, args[1]);
-          // printf("%s\n", tracker);
-          if(chdir(temp) == 0){
-            getcwd(tracker, 1024);
-            // printf("CHANGE SUCCESS: %s\n", tracker);
-            char prompter[1024];
-            strcpy(prompter, tracker);
-            curr = prompter;
-            for(int i = 0; i < 6; i++){
-              strsep(&curr, "/");
-              // printf("TOKEN HERE: %s\n", token);
-              // printf("CURR HERE: %s\n", curr);
-            }
-          }
-          else{
-            // printf("%s\n", tracker);
-            // printf("Invalid path.\n");
-            printf("%s\n",strerror(errno));
-          }
-          // chdir()
+  	 args[count] = token;
+  	 count++;
+  	}
+  	args[count] = NULL;
+  	pid_t p;
+  	p = fork();
+  	if(p < 0){
+       printf("%s\n",strerror(errno));
+    }
+    else if(p == 0){
+      if(strcmp(args[0], "cd") == 0){
+        executedcommand = 0;
+		if(strstr(args[1], "~") != NULL){			
+			char *home_dir = getenv("HOME");
+			chdir(home_dir);
+			getcwd(tracker, 1024);
+			//printf("tracker: %s\n", tracker);
+			curr_tier = homedir_tier;
+			if(strcmp(args[1], "~") != 0){
+				char evenmoreargs[1024];
+				strcpy(evenmoreargs, args[1]);
+				char realargs[1024];
+				for(int i = 1; i < strlen(evenmoreargs); i++){
+					realargs[i - 1] = evenmoreargs[i];
+				}
+				realargs[strlen(evenmoreargs ) - 1] = '\0';
+				strcpy(args[1], realargs);
+				//printf("args1: %s\n", args[1]);
+				//chdir(args[1]);
+				//curr_tier
+			}
+		}
+        // printf("%s\n", args[1]);
+        char temp[1024];
+        strcpy(temp, tracker);
+        strcat(temp, "/");
+        strcat(temp, args[1]);
+        //printf("temp: %s\n", temp);
+        if(strcmp(args[1], "~") == 0 || chdir(temp) == 0){
+          getcwd(tracker, 1024);
+          // printf("CHANGE SUCCESS: %s\n", tracker);
+          char prompter[1024];
+          strcpy(prompter, tracker);
+          curr = prompter;
+		char stringtemp[1024];
+		strcpy(stringtemp, tracker);
+		tempcurr = stringtemp;
+          // curr contains new pwd printf("%s\n", curr);
+		  if(strcmp(args[1], "~") != 0){
+			for (curr_tier=0; tempcurr[curr_tier]; tempcurr[curr_tier]=='/' ? curr_tier++ : *tempcurr++); //change tempcurr xd
+		  }
+          if(curr_tier > homedir_tier){
+         		printf("~");
+			for(int i = 0; i < homedir_tier + 1; i++){
+				token = strsep(&curr, "/");
+			}
+		  }
+	   else if (curr_tier ==  homedir_tier){
+		printfordashes = 0;
+        }else{
+			printfordashes = 0;
+		}
         }
         else{
-          execvp(args[0], args);
-      	  exit(0);
-        }
+          // printf("%s\n", tracker);
+          printf("Invalid path.\n");
+		  executedcommand = 1;
+		}
+        // chdir()
+		}
+      else{
+
+        execvp(args[0], args);
+    	  exit(0);
       }
-      int status;
-      wait(&status);
+
     }
+    int status;
+    wait(&status);
 
     // char loc[1024];
     // getcwd(loc, 1024);
-    printf("~/%s/ $ ", curr);
+
+
+  if(executedcommand){
+   if(curr_tier == homedir_tier){
+		printf("~$ ");
+	  }
+	else if(homedir_tier > curr_tier){
+		printf("%s $ ", curr);
+	}	
+	  else{
+		printf("~/%s $ ", curr);
+	  }
+  }
+  else if(printfordashes){
+	if(curr_tier == homedir_tier){
+		printf("~$ ");
+	}
+	else if(homedir_tier > curr_tier){
+		printf("%s $ ", curr);
+	}	
+	else{
+		printf("/%s $ ", curr);
+	}
+	}
+	
+  else if(curr_tier == homedir_tier){
+		printf("~$ ");
+	}
+	else{
+		printf("%s $ ",  curr);
+	}
+	printfordashes = 1;
+  if(homedir_tier < curr_tier){
+    executedcommand = 1;
+  }
     fflush(stdout);
   }
   exit(0);
+
 }
