@@ -7,13 +7,13 @@
 
 **Group Name: WE_HATE_HEADERS**
 
-##Implementations:
-+Processes user input
-+cd can support cd ~ 
-+Redirection 
-+Works with files using Windows line-endings
-+Changes home directory to "~"
-##Bugs
-+"exit" changes directory if you are in a different directory than the one you ./shell(ed) with
-##Function Headers
-+We hate them
+## Implementations:
++ Processes user input
++ cd can support cd ~ 
++ Redirection 
++ Works with files using Windows line-endings
++ Changes home directory to "~"
+## Bugs
++ "exit" changes directory if you are in a different directory than the one you ./shell(ed) with
+## Function Headers
++ We hate them
