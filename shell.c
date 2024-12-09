@@ -14,6 +14,7 @@
 
 const char *homedir;
 
+// ALL OUR FUNCTIONALITY IS IN THIS FUNCTION - EVERYTHING
 int main(int argc, char *argv[]){
   int homedir_tier, curr_tier, printfordashes = 1, executedcommand = 1;
   homedir = getpwuid(getuid())->pw_dir;
@@ -49,7 +50,7 @@ if(curr_tier >  homedir_tier){
   fflush(stdout);
   char line_buff[256];
   while(fgets(line_buff,255,stdin) != NULL){
-    char *nl = strchr(line_buff, '\n');	  
+    char *nl = strchr(line_buff, '\n');
 	if(nl){
 		*nl = '\0';
 	}
@@ -61,7 +62,7 @@ if(curr_tier >  homedir_tier){
     strcpy(a, line_buff);
     char *reala = a;
     char *token;
-    
+
     while((token = strsep(&reala,";")) != NULL){
       if (strcmp(token, "exit") == 0){
         exit(0);
@@ -100,7 +101,7 @@ if(curr_tier >  homedir_tier){
       else if(p == 0){
 	if(strcmp(args[0], "cd") == 0){
         executedcommand = 0;
-		if(strstr(args[1], "~") != NULL){			
+		if(strstr(args[1], "~") != NULL){
 			char *home_dir = getenv("HOME");
 			chdir(home_dir);
 			getcwd(tracker, 1024);
@@ -123,7 +124,7 @@ if(curr_tier >  homedir_tier){
         // printf("%s\n", args[1]);
         char temp[1024];
         strcpy(temp, tracker);
-        strcat(temp, "/");			
+        strcat(temp, "/");
         strcat(temp, args[1]);
         if(strcmp(args[1], "~") == 0 || chdir(temp) == 0){
           getcwd(tracker, 1024);
@@ -220,7 +221,7 @@ if(curr_tier >  homedir_tier){
 	  }
 	else if(homedir_tier > curr_tier){
 		printf("%s $ ", curr);
-	}	
+	}
 	  else{
 		printf("~/%s $ ", curr);
 	  }
@@ -231,12 +232,12 @@ if(curr_tier >  homedir_tier){
 	}
 	else if(homedir_tier > curr_tier){
 		printf("%s $ ", curr);
-	}	
+	}
 	else{
 		printf("/%s $ ", curr);
 	}
 	}
-	
+
   else if(curr_tier == homedir_tier){
 		printf("~$ ");
 	}

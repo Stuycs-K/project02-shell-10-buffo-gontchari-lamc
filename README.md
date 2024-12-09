@@ -9,11 +9,11 @@
 
 ## Implementations
 + Processes user input
-+ cd can support cd ~ 
-+ Redirection 
++ cd can support cd ~
++ Redirection
 + Works with files using Windows line-endings
 + Changes home directory to "~"
 ## Bugs
-+ "exit" changes directory if you are in a different directory than the one you ./shell(ed) with
++ using "exit" and "ctrl+d" if you are in a different directory than the one you ./shell(ed) with, will progressively reprint the file path until you get back to the one you started with, and only then can it exit
 ## Function Headers
 + We hate them
