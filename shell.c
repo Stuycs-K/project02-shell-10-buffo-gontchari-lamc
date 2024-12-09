@@ -49,7 +49,6 @@ if(curr_tier >  homedir_tier){
   fflush(stdout);
   char line_buff[256];
   while(fgets(line_buff,255,stdin) != NULL){
-printf("Raw line: %s\n", line_buff);
     char *nl = strchr(line_buff, '\n');	  
 	if(nl){
 		*nl = '\0';
@@ -58,7 +57,6 @@ printf("Raw line: %s\n", line_buff);
     if (cr) {
         *cr = '\0';
     }
-printf("Raw line after removed: %s\n", line_buff);
     char a[256];
     strcpy(a, line_buff);
     char *reala = a;
@@ -127,10 +125,6 @@ printf("Raw line after removed: %s\n", line_buff);
         strcpy(temp, tracker);
         strcat(temp, "/");			
         strcat(temp, args[1]);
-        printf("args0: %s\n", args[0]);
-        printf("args1: %s\n", args[1]);
-        printf("args2: %s\n", args[2]);
-        printf("temp: %s\n", temp);
         if(strcmp(args[1], "~") == 0 || chdir(temp) == 0){
           getcwd(tracker, 1024);
           // printf("CHANGE SUCCESS: %s\n", tracker);
