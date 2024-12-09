@@ -7,7 +7,7 @@
 
 **Group Name: WE_HATE_HEADERS**
 
-## Implementations:
+## Implementations
 + Processes user input
 + cd can support cd ~ 
 + Redirection 
